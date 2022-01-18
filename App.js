@@ -20,20 +20,40 @@ export default function App() {
     })
   ).current;
 
-  const moveUp = () => {
-    Animated.timing(POSITION, {
-      toValue: {
-        x: -SCREEN_WIDTH / 2,
-        y: -SCREEN_HEIGHT / 2,
-      },
-      useNativeDriver: false,
-    });
-  };
-
-  const rotation = POSITION.y.interpolate({
-    inputRange: [-300, 300],
-    outputRange: ["-360deg", "360deg"],
+  const topLeft = Animated.timing(POSITION, {
+    toValue: {
+      x: -SCREEN_WIDTH / 2 + 100,
+      y: -SCREEN_HEIGHT / 2 + 100,
+    },
+    useNativeDriver: false,
   });
+  const bottomLeft = Animated.timing(POSITION, {
+    toValue: {
+      x: -SCREEN_WIDTH / 2 + 100,
+      y: SCREEN_HEIGHT / 2 - 100,
+    },
+    useNativeDriver: false,
+  });
+  const bottomRight = Animated.timing(POSITION, {
+    toValue: {
+      x: SCREEN_WIDTH / 2 - 100,
+      y: SCREEN_HEIGHT / 2 - 100,
+    },
+    useNativeDriver: false,
+  });
+  const topRight = Animated.timing(POSITION, {
+    toValue: {
+      x: SCREEN_WIDTH / 2 - 100,
+      y: -SCREEN_HEIGHT / 2 + 100,
+    },
+    useNativeDriver: false,
+  });
+
+  const moveUp = () => {
+    Animated.loop(
+      Animated.sequence([bottomLeft, bottomRight, topRight, topLeft])
+    ).start();
+  };
 
   const borderRadius = POSITION.y.interpolate({
     inputRange: [-300, 300],
@@ -44,6 +64,7 @@ export default function App() {
     inputRange: [-300, 300],
     outputRange: ["rgb(255, 99, 71)", "rgb(71, 166, 255)"],
   });
+
   return (
     <Container>
       <Pressable onPress={moveUp}>
@@ -51,10 +72,7 @@ export default function App() {
           style={{
             backgroundColor: bgColor,
             borderRadius,
-            transform: [
-              { rotateY: rotation },
-              ...POSITION.getTranslateTransform(),
-            ],
+            transform: [...POSITION.getTranslateTransform()],
           }}
         />
       </Pressable>
